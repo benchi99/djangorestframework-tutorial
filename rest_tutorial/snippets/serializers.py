@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import Snippet, LANGUAGE_CHOICES, STYLE_CHOICES
+from django.contrib.auth.models import User
 
 """
 Clase serializador Snippets
@@ -35,11 +36,42 @@ class SnippetSerializer(serializers.Serializer):
 
 """
 VVV --- UTILIZANDO CLASE MODELSERIALIZER --- VVV
-"""
 
 class SnippetSerializer(serializers.ModelSerializer):
     
+    autor = serializers.ReadOnlyField(source = 'autor.username')
+
     class Meta:
         model = Snippet
 
-        fields = ('id', 'titulo', 'codigo', 'linenos', 'lenguaje', 'estilo')
+        fields = ('id', 'titulo', 'codigo', 'linenos', 'lenguaje', 'estilo', 'autor', )
+
+class UserSerializer(serializers.ModelSerializer):
+    snippets = serializers.PrimaryKeyRelatedField(many=True, queryset=Snippet.objects.all())
+
+    class Meta: 
+        model = User
+        fields = ('id', 'username', 'snippets')
+"""
+
+"""
+VVV --- UTILIZANDO CLASE HYPERLINKEDMODELSERIALIZER --- VVV
+
+"""
+class SnippetSerializer(serializers.HyperlinkedModelSerializer):
+    
+    autor = serializers.ReadOnlyField(source = 'autor.username')
+    remarcado = serializers.HyperlinkedIdentityField(view_name='snippet-remarcado', format='html')
+
+    class Meta:
+        model = Snippet
+
+        fields = ('url', 'id', 'titulo', 'codigo', 'linenos', 'lenguaje', 'estilo', 'autor', 'remarcado',)
+
+class UserSerializer(serializers.HyperlinkedModelSerializer):
+    snippets = serializers.HyperlinkedRelatedField(many=True, view_name='snippet-detail', read_only=True)
+
+    class Meta: 
+        model = User
+        fields = ('url', 'id', 'username', 'snippets')
+
