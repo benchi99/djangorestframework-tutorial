@@ -61,7 +61,7 @@ VVV --- UTILIZANDO CLASE HYPERLINKEDMODELSERIALIZER --- VVV
 class SnippetSerializer(serializers.HyperlinkedModelSerializer):
     
     autor = serializers.ReadOnlyField(source = 'autor.username')
-    remarcado = serializers.HyperlinkedIdentityField(view_name='snippet-remarcado', format='html')
+    remarcado = serializers.HyperlinkedIdentityField(view_name='snippet-highlight', format='html')
 
     class Meta:
         model = Snippet
